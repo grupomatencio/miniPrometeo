@@ -9,6 +9,7 @@
             Errores
         </title>
         <link href="{{ asset('css/login.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <link rel="icon" href="{{ asset('img/sin fondo - copia_favicon.png') }}" type="image/x-icon">
     </head>
 

@@ -13,14 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes([
+    'register' => false
+]);
 
 Route::get('/', function () {
-    return view('welcome');
-}) ->name('login');
-Route::get('/1', function () {
-    return view('auth.login1');
+    $error = session()->get('error');
+    if (Auth::check()) {
+        return redirect()->route('home')->with('error', $error);
+    }
+    return redirect('/login');
 });
 
-Auth::routes();
+Route::get('/home', function () {
+    return view('plantilla.plantilla');
+})->name('home')->middleware(['auth', 'check.processor']);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

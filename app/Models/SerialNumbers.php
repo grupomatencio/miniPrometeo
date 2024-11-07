@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Machine extends Model
+class SerialNumbers extends Model
 {
     use HasFactory;
 
-    protected $table =  'machines';
+    protected $table =  'serialnumbers';
 
     protected $fallable = [
-        'name', 'alias', 'local_id', 'bar_id', 'delegation_id', 'identificador'
+        'serial_number', 'local_id'
     ];
 }

@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PedirAyudaController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes([
-    'register' => false
-]);
+Auth::routes();
 
 Route::get('/', function () {
     $error = session()->get('error');
@@ -26,7 +27,16 @@ Route::get('/', function () {
 });
 
 Route::get('/home', function () {
-    return view('plantilla.plantilla');
+    return view('home');
 })->name('home')->middleware(['auth', 'check.processor']);
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::post('/pedir_ayuda', [PedirAyudaController::class, 'sendMessage'])->name('pedir.ayuda');
+
+Route::get('/machines1', function() {
+    return view('machines.index1');
+})->name('machine1.index');
+
+
+Route::get('/machines', function() {
+    return view('machines.index');
+})->name('machines.index');

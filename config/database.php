@@ -90,7 +90,19 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
-
+        'remote_prometeo' => [
+            'driver' => 'pgsql',
+            'host' => '192.168.56.1',  // IP de tu servidor PostgreSQL remoto
+            'port' => '5432',           // Puerto de la base de datos (por defecto PostgreSQL usa 5432)
+            'database' => env('REMOTE_DB_DATABASE', 'prometeo'), // Nombre de la base de datos
+            'username' => env('REMOTE_DB_USERNAME', 'admin'), // Usuario para la conexión
+            'password' => env('REMOTE_DB_PASSWORD', 'admin'), // Contraseña del usuario
+            'charset' => 'utf8',         // Codificación de la base de datos
+            'prefix' => '',              // Prefijo para las tablas (si no quieres ninguno, déjalo vacío)
+            'prefix_indexes' => true,    // Indices de las tablas
+            'search_path' => 'public',   // Esquema de la base de datos (puedes dejarlo como está)
+            'sslmode' => 'prefer',       // Modo SSL, ajusta si es necesario
+        ],
     ],
 
     /*
@@ -123,7 +135,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

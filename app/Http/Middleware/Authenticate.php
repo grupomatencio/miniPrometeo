@@ -19,3 +19,7 @@ class Authenticate extends Middleware
         }
     }
 }
+
+
+//$registros = DB::connection('remote_prometeo')->table('machines')->get();
+

@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('plantilla.plantilla')
 
-@section('content')
+@section('contenido')
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -15,6 +16,13 @@
                     @endif
 
                     {{ __('You are logged in!') }}
+
+                    <!-- Solo para comprobar ID de processodor -->
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

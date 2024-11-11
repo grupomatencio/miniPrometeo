@@ -14,9 +14,10 @@ use App\Http\Controllers\Api\ApiControllerGetSerialNumber;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+/*
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+});*/
 
+Route::get('/index', [ApiControllerGetSerialNumber::class, 'index'])->name('index');
 Route::post('/compareSerialNumber', [ApiControllerGetSerialNumber::class, 'compareSerialNumber'])->name('compareSerialNumber');

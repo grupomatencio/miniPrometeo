@@ -48,15 +48,24 @@ class CheckProcessorSerial
     }
 
 
-    private function compartirSerialNumber($serialNumber) {
+    /*private function compartirSerialNumber($serialNumber) {
+
 
         // URL API Prometeo
-        $url = 'http://156.90.90.1/api/compareSerialNumber';
+        $url = 'http://192.168.1.182/api/index';
 
+
+        log::info('middle');
+        log::info($serialNumber);
         // Enviamos un Post con datos
-        $response = Http::post($url, [
+        /* $response = Http::post($url, [
             'key1' => $serialNumber
         ]);
+
+        $response = Http::get($url);
+
+        log::info('middle');
+        log::info($response);
 
         // Respusta
         if ($response->successful()) {
@@ -65,5 +74,25 @@ class CheckProcessorSerial
             return false;
         }
 
+    }*/
+
+    private function compartirSerialNumber($serialNumber) {
+        // URL API Prometeo
+        $url = 'http://192.168.1.182/api/index';
+        log::info('Enviando solicitud a la API: ' . $url);
+
+        // Enviamos un GET
+        $response = Http::get($url);
+
+        // Registra el código de estado y el cuerpo de la respuesta
+        log::info('Código de estado de la respuesta: ' . $response->status());
+        log::info('Cuerpo de la respuesta: ' . $response->body());
+
+        // Verifica si la respuesta fue exitosa
+        if ($response->successful()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

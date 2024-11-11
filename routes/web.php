@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PedirAyudaController;
+use App\Http\Controllers\MachineController;
 
 
 /*
@@ -32,11 +33,11 @@ Route::get('/home', function () {
 
 Route::post('/pedir_ayuda', [PedirAyudaController::class, 'sendMessage'])->name('pedir.ayuda');
 
-Route::get('/machines1', function() {
-    return view('machines.index1');
-})->name('machine1.index');
+Route::get('/welcome', function() {
+    return view('welcome');
+})->name('welcome');
 
 
-Route::get('/machines', function() {
-    return view('machines.index');
-})->name('machines.index');
+Route::get('/machines', [MachineController::class, 'index'])->name('machines');
+Route::get('machines/delegation/{id}', [MachineController::class, 'create'])->name('machineDelegation.create');
+// Route::resource('machines', MachineController::class);

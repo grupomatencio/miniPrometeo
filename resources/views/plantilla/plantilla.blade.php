@@ -58,7 +58,7 @@
                 </div>
                 <ul class="navbar-nav flex-column w-100" id="sidebarMenu">
                     <li class="nav-item w-100">
-                         <a class="nav-link" href="/mschines" data-bs-toggle="collapse"
+                         <a class="nav-link" href="/welcome" data-bs-toggle="collapse"
                             aria-expanded="false" data-bs-target="#valoresMinimosCillapse">
                             <i class="bi bi-square-fill"></i> Configuración miniprometeo
                         </a>
@@ -66,7 +66,7 @@
                             aria-expanded="false" data-bs-target="#valoresMinimosCillapse">
                             <i class="bi bi-square-fill"></i> Asignar recargas auxilares
                         </a>
-                        <a class="nav-link" href="/machines1" data-bs-toggle="collapse"
+                        <a class="nav-link" href="" data-bs-toggle="collapse"
                             aria-expanded="false" data-bs-target="#valoresMinimosCillapse">
                             <i class="bi bi-square-fill"></i> Conexiones de dispositivos
                         </a>

@@ -9,17 +9,35 @@ use Illuminate\Support\Facades\Log;
 
 class ApiControllerGetSerialNumber extends Controller
 {
-    public function compararSerialNumber (Request $request) {
+    public function index (Request $request) {
+
+        return response() -> json ([
+            'success' => true,
+        ],200);
+
+        /*$serialNumber = SerialNumbers::all();
+        return $serialNumber;*/
+
+    }
+    public function compareSerialNumber (Request $request) {
         $serialNumber = $request -> input('serialNumber');
+        log::info('api');
         log::info($serialNumber);
 
 
-        $findSerialNumber = SerialNumbers::findOrFile() -> where('serialnumber', $serialNumber );
+        $findSerialNumber = SerialNumbers::where('serialnumber', $serialNumber ) -> fistOrFile();
+
+        log::info('bd');
+        log::info($findSerialNumber);
 
         if ($findSerialNumber) {
-            return true;
+            return response() -> json ([
+                'success' => true,
+            ],200);
         } else {
-            return false;
+            return response() -> json ([
+                'success' => false,
+            ],404);
         }
     }
 }

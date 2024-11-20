@@ -28,6 +28,7 @@ class CreateTablasUsersSerialnumberMachines extends Migration
             $table -> bigInteger('bar_id');
             $table -> bigInteger('delegation_id');
             $table -> string('identificador') -> unique();
+            $table -> integer('r_auxilar') ->unsigned() -> nullable() -> check ('r_auxilar >= 1 AND r_auxilar <= 50');
         });
     }
 

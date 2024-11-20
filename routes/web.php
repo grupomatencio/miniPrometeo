@@ -1,9 +1,12 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PedirAyudaController;
 use App\Http\Controllers\MachineController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ConfiguracionController;
 
 
 /*
@@ -37,7 +40,11 @@ Route::get('/welcome', function() {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/machines/search', [MachineController::class, 'search'])->name('machines.search');
+Route::resource('machines', MachineController::class);
 
-Route::get('/machines', [MachineController::class, 'index'])->name('machines');
-Route::get('machines/delegation/{id}', [MachineController::class, 'create'])->name('machineDelegation.create');
-// Route::resource('machines', MachineController::class);
+Route::get('/import', [ImportController::class, 'index'])->name('import.index');
+Route::get('/import/store', [ImportController::class, 'store'])->name('import.store');
+
+Route::get('/configuracion/buscar', [ConfiguracionController::class, 'buscar'])->name('configuracion.buscar');
+Route::resource('configuracion', ConfiguracionController::class)->names('configuracion');

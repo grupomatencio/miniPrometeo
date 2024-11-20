@@ -18,7 +18,7 @@
                                     <a class="btn btn-primary w-100 btn-ttl">Máquinas</a>
                                 </div>
                             </div>
-                            <form action="#" method="GET" class="mb-4"
+                            <form action="{{ route('machines.search')}}" method="GET" class="mb-4"
                                 autocomplete="off">
                                 <div class="input-group">
                                     <input type="text" name="search" class="form-control"
@@ -32,7 +32,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col"><a class="btn btn-primary w-100 btn-ttl"
-                                                href="#">+</a></th>
+                                                href="{{ route('machines.create') }}">+</a></th>
                                         <th scope="col">Nombre</th>
                                         <th scope="col">Identificador</th>
                                     </tr>
@@ -64,7 +64,7 @@
                                                     <div class="modal-body">
                                                         <div class="text-center">
                                                             <a type="submit" class="btn btn-warning"
-                                                                href="#">Editar</a>
+                                                                href="{{ route('machines.edit', $machine->id) }}">Editar</a>
                                                             <a class="btn btn-danger" data-bs-toggle="modal"
                                                                 data-bs-target="#eliminarModal{{ $machine->id }}">
                                                                 Eliminar
@@ -92,7 +92,7 @@
                                                         ¿Estas seguro que quieres eliminar la máquina {{ $machine->name }}?
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <form action="#"
+                                                        <form action="{{ route('machines.destroy', $machine->id) }}"
                                                             method="POST">
                                                             @csrf
                                                             @method('DELETE')

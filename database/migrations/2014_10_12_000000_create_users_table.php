@@ -17,6 +17,10 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('password');
+            $table -> string('ip_cambio') ->nullable();
+            $table -> integer('port_cambio') ->nullable();
+            $table -> string('ip_comdatahost') ->nullable();
+            $table -> integer('port_comdatahost') ->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

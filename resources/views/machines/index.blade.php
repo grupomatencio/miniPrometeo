@@ -31,21 +31,51 @@
                             <table class="table table-bordered text-center">
                                 <thead>
                                     <tr>
-                                        <th scope="col"><a class="btn btn-primary w-100 btn-ttl"
-                                                href="{{ route('machines.create') }}">+</a></th>
-                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Alias</th>
                                         <th scope="col">Identificador</th>
+                                        <th scope="col">Auxiliar</th>
+                                        <th scope="col"><a class="btn btn-primary w-100 btn-ttl"
+                                            href="{{ route('machines.create') }}">+</a></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($machines as $machine)
                                         <tr class="user-row">
-                                            <td>
-                                                <a class="btn btn-primary w-100 btn-inf" data-bs-toggle="modal"
-                                                    data-bs-target="#modalAccionesLocal{{ $machine->id }}">...</a>
-                                            </td>
-                                            <td>{{ $machine->name }}</td>
-                                            <td>{{ $machine->identificador }}</td>
+                                            <form action="{{ route('machines.update', $machine->id) }}" method="POST" autocomplete="off">
+                                                @csrf
+                                                @method('PUT')
+                                                    <td>
+                                                        <input type="text" class="form-control w-50 @error('alias.' .$machine->id) is-invalid @enderror"
+                                                            name = "alias[{{$machine -> id}}]"
+                                                            id="{{$machine -> id}}"
+                                                            value = "{{ $machine->alias}}"
+                                                            disabled>
+                                                        @error('alias.' .$machine->id)
+                                                            <div class="invalid-feedback text-start"> {{ $message }} </div>
+                                                        @enderror
+                                                    </td>
+                                                    <td>{{ $machine->identificador }}</td>
+                                                    <td>
+                                                        <input type="text" class="form-control w-50 @error('auxiliar.' .$machine->id) is-invalid @enderror"
+                                                            id="{{ $machine -> id}}"
+                                                            name ="auxiliar[{{ $machine->id}}]"
+                                                            value = "{{ $machine->auxiliar}}"
+                                                            disabled>
+                                                        @error('auxiliar.' .$machine->id)
+                                                            <div class="invalid-feedback text-start"> {{ $message }} </div>
+                                                        @enderror
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex">
+                                                            <button type="button" class="btn btn-primary w-100 btn-in edit" id="{{ $machine -> id}}">Editar</button>
+                                                            <button type="submit" class="btn btn-success w-100 btn-in d-none guardar" id="{{ $machine -> id}}">Guardar</button>
+                                                            <button type="button" class="btn btn-primary w-100 btn-in ms-2 d-none volver" id="{{ $machine -> id}}">Volver</button>
+                                                            <a class="btn btn-danger w-100 btn-inf ms-2 eliminar" id="{{ $machine -> id}}" data-bs-toggle="modal"
+                                                                data-bs-target="#modalAccionesLocal{{ $machine->id }}">Eliminar</a>
+                                                        </div>
+                                                    </td>
+
+                                            </form>
                                         </tr>
 
                                         <!--MODAL ACCIONES-->
@@ -63,14 +93,11 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="text-center">
-                                                            <a type="submit" class="btn btn-warning"
-                                                                href="{{ route('machines.edit', $machine->id) }}">Editar</a>
                                                             <a class="btn btn-danger" data-bs-toggle="modal"
                                                                 data-bs-target="#eliminarModal{{ $machine->id }}">
                                                                 Eliminar
                                                             </a>
                                                         </div>
-                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -227,4 +254,86 @@
             @endif
         </div>
     </div>
+<script>
+
+        const editButtons = document.querySelectorAll('.edit');
+        const guardarButtons = document.querySelectorAll('.guardar');
+        const volverButtons = document.querySelectorAll('.volver');
+        const inputs = document.querySelectorAll('.form-control');
+        const eliminarButtons = document.querySelectorAll('.eliminar');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const buttonId = Number (event.target.id);
+
+                editButtons.forEach(but => {
+                    if (Number(but.id) == buttonId) {
+                        but.classList.add('d-none');
+                    } else {
+                        but.classList.remove('d-none');
+                    }
+                })
+                inputs.forEach(input => {
+                    if (Number(input.id) == buttonId) {
+                        input.removeAttribute('disabled');
+                    } else {
+                        input.setAttribute('disabled', 'true');
+                    }
+                })
+                guardarButtons.forEach(guardar => {
+                    if (Number(guardar.id) == buttonId) {
+                        guardar.classList.remove('d-none');
+                    } else {
+                        guardar.classList.add('d-none');
+                    }
+                })
+
+                volverButtons.forEach(volver => {
+                    if (Number(volver.id) == buttonId) {
+                        volver.classList.remove('d-none');
+                    } else {
+                        volver.classList.add('d-none');
+                    }
+                })
+
+                eliminarButtons.forEach(eliminar => {
+                    console.log(eliminarButtons);
+                    if (Number(eliminar.id) == buttonId) {
+                        eliminar.classList.add('d-none');
+                    } else {
+                        eliminar.classList.remove('d-none');
+                    }
+                })
+
+            })
+        })
+
+        volverButtons.forEach(button => {
+            button.addEventListener('click', function() {
+
+                editButtons.forEach(but => {
+                    but.classList.remove('d-none');
+                })
+                inputs.forEach(input => {
+                    input.setAttribute('disabled', 'true');
+                })
+                guardarButtons.forEach(guardar => {
+                    guardar.classList.add('d-none');
+                })
+
+                volverButtons.forEach(volver => {
+                    volver.classList.add('d-none');
+                })
+
+                eliminarButtons.forEach(eliminar => {
+                    eliminar.classList.remove('d-none');
+                })
+            })
+        })
+
+
+</script>
+
+
+
 @endsection

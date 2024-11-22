@@ -12,7 +12,7 @@ class Machine extends Model
     protected $table =  'machines';
 
     protected $fallable = [
-        'name', 'alias', 'local_id', 'bar_id', 'delegation_id', 'identificador'
+        'name', 'alias', 'local_id', 'bar_id', 'delegation_id', 'identificador', 'auxiliar'
     ];
 
     protected $guarded = ['id'];

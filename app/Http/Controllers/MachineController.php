@@ -121,43 +121,25 @@ class MachineController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Machine $machine)
+    public function update(Request $request, $id)
     {
+        // dd($request->alias);
         $request->validate([
-            'name' => ['required'],
-            'alias' => ['required'],
-            'model' => ['required'],
-            'codigo' => ['required', 'regex:/^[A-Za-z0-9]{3}$/'],
-            'serie' => ['required', 'regex:/^\d{2}( [A-Za-z]|[A-Za-z]{2})$/'],
-            'numero' => ['required', 'digits:6'],
-            //'local' => ['required'],
+            'alias.*' => ['required'],
+            'auxiliar.*' => ['required', 'numeric', 'unique:machines,auxiliar,' . $id]
         ], [
-            'name.required' => 'El nombre de la máquina es obligatorio.',
-            'alias.required' => 'El alias de la máquina es obligatorio.',
-            'model.required' => 'El modelo de la máquina es obligatorio.',
-            'codigo.required' => 'El código de la máquina es obligatorio.',
-            'codigo.regex' => 'El código debe ser una cadena de exactamente 3 caracteres alfanuméricos.',
-            'serie.required' => 'La serie de la máquina es obligatoria.',
-            'serie.regex' => 'La serie debe ser una cadena de 4 caracteres, con los primeros 2 siendo números y los últimos 2 siendo dos letras o un espacio seguido de una letra.',
-            'numero.required' => 'El número de la máquina es obligatorio.',
-            'numero.digits' => 'El número debe tener exactamente 6 dígitos.',
-            //'local.required' => 'El local de la máquina es obligatorio.',
+            'alias.*.required' => 'El alias de la máquina es obligatorio.',
+            'auxiliar.*.required' => 'El número de la máquina es obligatorio.',
+            'auxiliar.*.numeric' => 'En este campo solo deben ir dígitos.',
+            'auxiliar.*.unique' => "Este número ya está en uso."
         ]);
 
-        $local = explode(":", $request->local);
-        $identificador = $request->model . ':' . $request->codigo . ':' . $request->serie . ':' . $request->numero;
 
-        $machine->identificador = $identificador;
-        $machine->name = $request->name;
-        $machine->alias = $request->alias;
+        Machine::find($id) -> update ([
+            'alias' => $request->alias[$id],
+            'auxiliar' => $request->auxiliar[$id]
+        ]);
 
-        $machine->local_id = 1;
-        $machine->bar_id = 1;
-        $machine->delegation_id = $request->delegation_id;
-
-        $machine->timestamps = false;
-
-        $machine->save();
         return redirect()->route('machines.index', $request->delegation_id);
     }
 

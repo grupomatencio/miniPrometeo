@@ -14,17 +14,10 @@ class ConfiguracionController extends Controller
      */
     public function index()
     {
-        $user = User::where('name','admin') -> first();
+        $user_cambio = User::where('name','ccm') -> first();
+        $user_comDataHost = User::where('name','admin') -> first();
 
-        if (empty($user ->ip_comdatahost)) {
-            $user ->ip_comdatahost = $this -> getLocalIp ();
-        }
-
-        if (empty($user ->port_cambio)) {
-            $user ->port_cambio = 3080;
-        }
-
-        return view('configuracion.index', compact('user'));
+        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
     }
 
     /**
@@ -91,18 +84,26 @@ class ConfiguracionController extends Controller
             'port_comdatahost.required' => 'Este campo es obligatorio.',
             'ip_cambio.ipv4' => 'En este campo solo IP',
             'ip_comdatahost.ipv4' => 'En este campo solo IP',
-            'port_cambio.numeric' => 'En este campo solo digitos',
+            'port_cambio.numeric' => 'En    este campo solo digitos',
             'port_cambio.min' => 'Numero de puerto muy grande',
             'port_comdatahost.numeric' => 'En este campo solo digitos',
             'port_comdatahost.min' => 'Numero de puerto muy grande',
         ]);
 
         $data = $request-> except ('_token');
-        User::findOrFail($id) -> update ($data);
+        User::where('name','ccm') -> update ([
+            'ip' => $data['ip_cambio'],
+            'port' => $data['port_cambio']
+        ]);
+        User::where('name','admin') -> update ([
+            'ip' => $data['ip_comdatahost'],
+            'port' => $data['port_comdatahost']
+        ]);
 
-        $user = User::findOrFail($id);
+        $user_cambio = User::where('name','ccm') -> first();
+        $user_comDataHost = User::where('name','admin') -> first();
 
-        return view('configuracion.index', compact('user'));
+        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
     }
 
     /**
@@ -113,22 +114,23 @@ class ConfiguracionController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::where('name','admin') -> first();
+        $user_cambio = User::where('name','ccm') -> first();
+        $user_cambio ->ip = null;
+        $user_cambio ->port = null;
+        $user_cambio -> save();
 
-        $user ->ip_cambio = null;
-        $user ->port_cambio = null;
-        $user ->ip_comdatahost = null;
-        $user ->port_comdatahost = null;
+        $user_comDataHost = User::where('name','admin') -> first();
+        $user_comDataHost ->ip = null;
+        $user_comDataHost ->port = null;
+        $user_comDataHost -> save();
 
-        $user -> save ();
-
-        return view('configuracion.index', compact('user'));
+        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
     }
 
     public function buscar() {
-        $user = User::where('name','admin') -> first();
-        $filePath = 'C:\Gistra\SMI2000\Setup-TicketController\preferences.cfg';
+        $user_cambio = User::where('name','ccm') -> first();
 
+        $filePath = 'C:\Gistra\SMI2000\Setup-TicketController\preferences.cfg';
 
         if (file_exists($filePath)) {
 
@@ -136,23 +138,23 @@ class ConfiguracionController extends Controller
             $fileContent = file_get_contents($filePath);
 
             if(preg_match('/<ServerIP>(.*?)<\/ServerIP>/', $fileContent, $matches)) {
-                $user ->ip_cambio = $matches[1];
+                $user_cambio ->ip = $matches[1];
             } else {
-                $user ->ip_cambio = '0.0.0.0';
+                $user_cambio ->ip = '0.0.0.0';
+            }
+
+            if(preg_match('/<ServerPort>(.*?)<\/ServerPort>/', $fileContent, $matches)) {
+                $user_cambio ->port = $matches[1];
+            } else {
+                $user_cambio ->port = '';
             }
         }
 
-        // dd(' ');
+        $user_comDataHost = new User;
+        $user_comDataHost ->ip = $this -> getLocalIp ();
+        $user_comDataHost ->port = 3506;
 
-        if (empty($user ->ip_comdatahost)) {
-            $user ->ip_comdatahost = $this -> getLocalIp ();
-        }
-
-        if (empty($user ->port_cambio)) {
-            $user ->port_cambio = 3080;
-        }
-
-        return view('configuracion.index', compact('user'));
+        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
     }
 
     private function getLocalIp () {

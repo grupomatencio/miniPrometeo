@@ -3,20 +3,20 @@
 @section('contenido')
 
 <div class="container">
-    <form action="{{ route('configuracion.update', $user_cambio->id) }}" method="POST" autocomplete="off">
+    <form action="{{ route('configuracion.update', $data['user_cambio']) }}" method="POST" autocomplete="off">
         @csrf
         @method('PUT')
-        <div class="col-8 offset-2 isla-list p-4 mt-5 mb-5 border border-primary">
-            <h2 class="mb-5"> Configurar conexión con maquina cambio</h2>
+        <div class="col-8 offset-2 isla-list p-4 mt-2 mb-2 border border-primary">
+            <h2 class="mb-3"> Configurar conexión con maquina cambio</h2>
 
             <!-- IP -->
-            <div class="form-floating">
+            <div class="form-floating pb-3">
                 <input type="text" name="ip_cambio" class="form-control @error('ip_cambio') is-invalid @enderror"
                     id="ip_cambio" placeholder="IP"
                     @if (old('ip_cambio'))
                         value="{{ old('ip_cambio') }}"
-                    @elseif ($user_cambio->ip)
-                        value="{{$user_cambio->ip}}"
+                    @elseif ($data['user_cambio']->ip)
+                        value="{{$data['user_cambio']->ip}}"
                     @endif>
                 <label for="ip_cambio">IP</label>
                 @if ($errors->has('ip_cambio'))
@@ -30,8 +30,8 @@
                     id="port_cambio" placeholder="Puerto"
                     @if (old('port_cambio'))
                         value="{{ old('port_cambio') }}"
-                    @elseif ($user_cambio->port)
-                        value="{{$user_cambio->port}}"
+                    @elseif ($data['user_cambio']->port)
+                        value="{{$data['user_cambio']->port}}"
                     @endif>
                 <label for="port_cambio">Puerto</label>
                 @error('port_cambio')
@@ -40,8 +40,8 @@
             </div>
         </div>
 
-        <div class="col-8 offset-2 isla-list p-4 mt-5 mb-5 border border-primary">
-            <h2 class="mb-5"> Configurar ComDataHost</h2>
+        <div class="col-8 offset-2 isla-list p-4 mt-2 mb-2 border border-primary">
+            <h2 class="mb-3"> Configurar ComDataHost</h2>
 
             <!-- IP -->
             <div class="form-floating pb-3">
@@ -49,8 +49,8 @@
                     id="ip_comdatahost" placeholder="IP"
                     @if (old('ip_comdatahost'))
                         value="{{ old('ip_comdatahost') }}"
-                    @elseif ($user_comDataHost->ip)
-                        value="{{$user_comDataHost->ip}}"
+                    @elseif ($data['user_comDataHost']->ip)
+                        value="{{$data['user_comDataHost']->ip}}"
                     @endif>
                 <label for="ip_comdatahost">IP</label>
                 @error('ip_comdatahost')
@@ -64,8 +64,8 @@
                     id="port_comdatahost" placeholder="Puerto"
                     @if (old('port_comdatahost'))
                         value="{{ old('port_comdatahost') }}"
-                    @elseif ($user_comDataHost->port)
-                        value="{{$user_comDataHost->port}}"
+                    @elseif ($data['user_comDataHost']->port)
+                        value="{{$data['user_comDataHost']->port}}"
                     @endif>
                 <label for="port_comdatahost">Puerto</label>
                 @error('port_comdatahost')
@@ -73,6 +73,59 @@
                 @enderror
             </div>
         </div>
+
+        <div class="col-8 offset-2 isla-list p-4 mt-2 mb-2 border border-primary">
+            <h2 class="mb-3"> Configurar disposición</h2>
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">Delegación</th>
+                        <th scope="col">Zona</th>
+                        <th scope="col">Local</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{$data['delegation'] -> name}}
+                        </td>
+                        <td>
+                            @if (count($data['zones']) === 1 )
+                                {{$data['zones'][0] -> name }}
+                            @else
+                                <select name="zones" class="form-control @error('zones') is-invalid @enderror">
+                                    <option value =""> == Elije una Zona ==</option>
+                                    @foreach ($data['zones'] as $zona)
+                                        <option value = "{{$zona -> id}}">{{$zona -> name}} </option>
+                                    @endforeach
+                                </select>
+                                @error('zones')
+                                    <div class="invalid-feedback"> {{ $message }} </div>
+                                @enderror
+                            @endif
+                        </td>
+                        <td>
+                            @if (count($data['locales']) === 1 )
+                                {{$data['locales'][0] -> name }}
+                            @else
+                                <select name="locales" class="form-control @error('locales') is-invalid @enderror">
+                                    <option value =""> == Elije un Local ==</option>
+                                    @foreach ($data['locales'] as $local)
+                                        <option value = "{{$local -> id}}">{{$local -> name}} </option>
+                                    @endforeach
+                                </select>
+                                @error('locales')
+                                    <div class="invalid-feedback"> {{ $message }} </div>
+                                @enderror
+                            @endif
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
 
          <!-- Botón de Enviar -->
         <div class="form-group mt-3 col-4 offset-4">
@@ -86,12 +139,12 @@
     </div>
     <div class="d-flex">
         <a class="offset-4 col-4 pt-3 pb-3" data-bs-toggle="modal"
-           data-bs-target="#modalAccionesLocal{{ $user_cambio->id }}">
+           data-bs-target="#modalAccionesLocal{{ $data['user_cambio']->id }}">
             <button class="btn btn-danger w-100" >Borrar datos de configuración</button>
         </a>
     </div>
     <!--MODAL ACCIONES-->
-    <div class="modal fade" id="modalAccionesLocal{{ $user_cambio->id }}"
+    <div class="modal fade" id="modalAccionesLocal{{ $data['user_cambio']->id }}"
         data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="modalAcciones" aria-hidden="true">
         <div class="modal-dialog">
@@ -106,7 +159,7 @@
                     ¿Estas seguro que quieres eliminar datos del configuración?
                 </div>
                 <div class="modal-footer">
-                    <form action="{{ route('configuracion.destroy', $user_cambio->id) }}"
+                    <form action="{{ route('configuracion.destroy', $data['user_cambio']) }}"
                         method="POST">
                         @csrf
                         @method('DELETE')
@@ -137,7 +190,7 @@
                                                         ¿Estas seguro que quieres eliminar datos del configuración?
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <form action="{{ route('configuracion.destroy', $user_cambio->id) }}"
+                                                        <form action="{{ route('configuracion.destroy', $data['user_cambio']) }}"
                                                             method="POST">
                                                             @csrf
                                                             @method('DELETE')

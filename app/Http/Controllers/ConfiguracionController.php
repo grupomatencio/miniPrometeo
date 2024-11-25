@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Local;
+use App\Models\Zone;
+use App\Models\Delegation;
+
 
 class ConfiguracionController extends Controller
 {
@@ -16,8 +20,19 @@ class ConfiguracionController extends Controller
     {
         $user_cambio = User::where('name','ccm') -> first();
         $user_comDataHost = User::where('name','admin') -> first();
+        $locales = Local::all();
+        $zones=Zone::all();
+        $delegation = Delegation::where('name', 'Benidorm') -> first();
 
-        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
+        $data = [
+            'user_cambio' => $user_cambio,
+            'user_comDataHost' => $user_comDataHost,
+            'locales' => $locales,
+            'zones' => $zones,
+            'delegation' => $delegation
+        ];
+
+        return view('configuracion.index', compact('data'));
     }
 
     /**
@@ -77,6 +92,8 @@ class ConfiguracionController extends Controller
             'port_cambio' => ['required', 'numeric', 'max:10001'],
             'ip_comdatahost' => ['required', 'ipv4'],
             'port_comdatahost' => ['required', 'numeric', 'max:10001'],
+            'locales' => ['required'],
+            'zones' => ['required']
         ], [
             'ip_cambio.required' => 'Este campo es obligatorio.',
             'port_cambio.required' => 'Este campo es obligatorio.',
@@ -88,6 +105,8 @@ class ConfiguracionController extends Controller
             'port_cambio.min' => 'Numero de puerto muy grande',
             'port_comdatahost.numeric' => 'En este campo solo digitos',
             'port_comdatahost.min' => 'Numero de puerto muy grande',
+            'locales.required' => 'Este campo es obligatorio.',
+            'zones.required' => 'Este campo es obligatorio.'
         ]);
 
         $data = $request-> except ('_token');
@@ -100,10 +119,21 @@ class ConfiguracionController extends Controller
             'port' => $data['port_comdatahost']
         ]);
 
-        $user_cambio = User::where('name','ccm') -> first();
-        $user_comDataHost = User::where('name','admin') -> first();
+        $local = Local::find($data['locales']);
+        if($local) {
+            Local::truncate();
+            $local ->replicate() -> save();
+        }
 
-        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
+
+        $zone = Zone::find($data['zones']);
+        if($zone) {
+            Zone::query() -> delete ();
+            $zone ->replicate() -> save();
+        }
+
+
+        return redirect()->route('configuracion.index');
     }
 
     /**

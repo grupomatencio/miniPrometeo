@@ -19,6 +19,7 @@ return new class extends Migration
                 ->constrained('machines')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->string('number_modem');
             $table->timestamps();
         });
     }

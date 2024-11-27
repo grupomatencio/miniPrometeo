@@ -39,7 +39,7 @@ return new class extends Migration
             $table->string('identificador');
 
             // Definir un campo tipo que indica si es parent (1) o roulette (2)
-            $table->enum('type', ['parent', 'roulette'])->nullable();
+            $table->enum('type', ['parent', 'roulette','single'])->nullable();
 
             // Campo para asociar hijos a una máquina (ya sea tipo parent o roulette)
             $table->foreignId('parent_id')->nullable()->constrained('machines')->cascadeOnDelete();

@@ -14,9 +14,6 @@ class DelegationSeeder extends Seeder
      */
     public function run()
     {
-        //DEJAR DELEGACIÓN PROMETEO PARA CREAR SUPERUSER
-        Delegation::create(['id' => 0, 'name' => 'Prometeo']);
-
         collect([
             'Benidorm',
         ])->each(function ($delegation) {

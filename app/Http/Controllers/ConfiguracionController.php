@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Local;
 use App\Models\Zone;
 use App\Models\Delegation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class ConfiguracionController extends Controller
@@ -20,16 +22,16 @@ class ConfiguracionController extends Controller
     {
         $user_cambio = User::where('name','ccm') -> first();
         $user_comDataHost = User::where('name','admin') -> first();
-        $locales = Local::all();
-        $zones=Zone::all();
-        $delegation = Delegation::where('name', 'Benidorm') -> first();
+
+        // Obtener datos de Local, zona, delegacion
+        $disposicion = $this -> getDisposicion();
 
         $data = [
             'user_cambio' => $user_cambio,
             'user_comDataHost' => $user_comDataHost,
-            'locales' => $locales,
-            'zones' => $zones,
-            'delegation' => $delegation
+            'locales' => $disposicion['locales'],
+            'name_zona' =>  $disposicion['name_zona'],
+            'name_delegation' => $disposicion['name_delegation']
         ];
 
         return view('configuracion.index', compact('data'));
@@ -92,8 +94,7 @@ class ConfiguracionController extends Controller
             'port_cambio' => ['required', 'numeric', 'max:10001'],
             'ip_comdatahost' => ['required', 'ipv4'],
             'port_comdatahost' => ['required', 'numeric', 'max:10001'],
-            'locales' => ['required'],
-            'zones' => ['required']
+            'locales' => ['required']
         ], [
             'ip_cambio.required' => 'Este campo es obligatorio.',
             'port_cambio.required' => 'Este campo es obligatorio.',
@@ -105,33 +106,77 @@ class ConfiguracionController extends Controller
             'port_cambio.min' => 'Numero de puerto muy grande',
             'port_comdatahost.numeric' => 'En este campo solo digitos',
             'port_comdatahost.min' => 'Numero de puerto muy grande',
-            'locales.required' => 'Este campo es obligatorio.',
-            'zones.required' => 'Este campo es obligatorio.'
+            'locales.required' => 'Este campo es obligatorio.'
         ]);
 
-        $data = $request-> except ('_token');
-        User::where('name','ccm') -> update ([
-            'ip' => $data['ip_cambio'],
-            'port' => $data['port_cambio']
-        ]);
-        User::where('name','admin') -> update ([
-            'ip' => $data['ip_comdatahost'],
-            'port' => $data['port_comdatahost']
-        ]);
+        try {
 
-        $local = Local::find($data['locales']);
-        if($local) {
-            Local::truncate();
-            $local ->replicate() -> save();
+            $data = $request-> except ('_token');
+            User::where('name','ccm') -> update ([
+                'ip' => $data['ip_cambio'],
+                'port' => $data['port_cambio']
+            ]);
+            User::where('name','admin') -> update ([
+                'ip' => $data['ip_comdatahost'],
+                'port' => $data['port_comdatahost']
+            ]);
+
+            $serialNumberProcessor = getSerialNumber();
+
+            try {
+                $connection = DB::connection('remote_prometeo_test');
+
+                // dd ($data['locales']);
+
+                $result =$connection->table('licences')
+                     -> where('local_id',$data['locales'])
+                     -> where('serial_number',$serialNumberProcessor )
+                     -> first ();
+
+            } catch (\Exception $exception) {
+                Log::info($exception);
+                $result = null;
+            }
+
+            if ($result !== null) {
+                try {
+
+                    DB::beginTransaction();
+                    $local = Local::find($data['locales']);
+                    $zone = Zone::find($local -> zone_id);
+                    $delegation = Delegation::find($zone -> delegation_id);
+
+                    $localesParaEliminar = Local::where('id', '!=', $local -> id) -> get();
+                    $zonesParaEliminar = Zone::where('id', '!=',$zone -> id )-> get();
+                    $delegationsParaEliminar = Delegation::where('id', '!=', $delegation -> id)-> get();
+
+                    // dd ($localesParaEliminar);
+
+                    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+                    foreach ($localesParaEliminar as $loc) {
+                        $loc ->delete();
+                    }
+                    foreach ($zonesParaEliminar as $zon) {
+                        $zon ->delete();
+                    }
+                    foreach ($delegationsParaEliminar as $del) {
+                        $del ->delete();
+                    }
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+                    DB::commit();
+
+                } catch  (\Exception $exception) {
+                    DB::rollBack();
+                    Log::info($exception);
+                }
+            } else {
+                return redirect()->back()->with("errorSerialNumber", "Error de configuración. Pongas en contacto con servicios técnicos");
+            }
+
+        } catch (\Exception $exception) {
+            Log::info($exception);
         }
-
-
-        $zone = Zone::find($data['zones']);
-        if($zone) {
-            Zone::query() -> delete ();
-            $zone ->replicate() -> save();
-        }
-
 
         return redirect()->route('configuracion.index');
     }
@@ -154,9 +199,10 @@ class ConfiguracionController extends Controller
         $user_comDataHost ->port = null;
         $user_comDataHost -> save();
 
-        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
+        return redirect()->route('configuracion.index');
     }
 
+    // Para obtener datos en modo automatico
     public function buscar() {
         $user_cambio = User::where('name','ccm') -> first();
 
@@ -184,7 +230,18 @@ class ConfiguracionController extends Controller
         $user_comDataHost ->ip = $this -> getLocalIp ();
         $user_comDataHost ->port = 3506;
 
-        return view('configuracion.index', compact('user_cambio','user_comDataHost' ));
+        // Obtener datos de Local, zona, delegacion
+        $disposicion = $this -> getDisposicion();
+
+        $data = [
+            'user_cambio' => $user_cambio,
+            'user_comDataHost' => $user_comDataHost,
+            'locales' => $disposicion['locales'],
+            'name_zona' =>  $disposicion['name_zona'],
+            'name_delegation' => $disposicion['name_delegation']
+        ];
+
+        return view('configuracion.index', compact('data'));
     }
 
     private function getLocalIp () {
@@ -195,5 +252,28 @@ class ConfiguracionController extends Controller
             $localIp = $matches[1];
         }
         return $localIp;
+    }
+
+    // Para obtener datos de local, zona, delegation
+    private function getDisposicion () {
+        $locales = Local::all();
+        $zones=Zone::all();
+        $delegation = Delegation::all();
+        $name_zona = "";
+        $name_delegation = "";
+
+        if (count($zones) == 1) {
+            $name_zona = $zones[0] -> name;
+        }
+
+        if (count($delegation) == 1) {
+            $name_delegation = $delegation[0] ->name;
+        }
+
+        return $disposicion = [
+            'locales' => $locales,
+            'name_zona' =>  $name_zona,
+            'name_delegation' => $name_delegation
+        ];
     }
 }

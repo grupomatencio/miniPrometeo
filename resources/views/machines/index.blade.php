@@ -133,7 +133,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <div class="col-4 offset-8 pb-4">
+                            <div class="col-4 offset-8 pb-1">
                                 <a class="btn btn-danger w-100" data-bs-toggle="modal"
                                     data-bs-target="#modalPdf">Exportar <i class="bi bi-filetype-pdf"></i></a>
 
@@ -163,9 +163,28 @@
                                 </div>
 
                             </div>
+
+
+                            <div class="col-4 offset-8 pb-4">
+                                <a class="btn btn-success w-100" href="{{ route('import.index')}}"> Importar <i class="bi bi-box-arrow-in-right"></i>
+                                </a>
+
+                                <div class="d-flex justify-content-center mt-4">
+                                    @if (session ('errorConfiguracion'))
+                                        <div class="text-danger fw-semibold text-center">{{ session ('errorConfiguracion') }} </div>
+                                    @endif
+                                </div>
+                            </div>
+
+
+
+
+                            </div>
+
+
+
                             <div class="d-flex justify-content-center mt-4">
                                pagination
-                            </div>
                         </div>
                     </div>
                 </div>

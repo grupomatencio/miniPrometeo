@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Machine;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Local extends Model
+class Bar extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'id_zone',
-        'ip_address',
-        'port',
-        'idMachine'
     ];
 
     public function zone()
@@ -20,11 +20,9 @@ class Local extends Model
        return $this->belongsTo(Zone::class, 'zone_id');
     }
 
+
     public function machines()
     {
         return $this->hasMany(Machine::class);
     }
-
-
-
 }

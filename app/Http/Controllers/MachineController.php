@@ -16,7 +16,9 @@ class MachineController extends Controller
     {
         try {
 
-            $machines = Machine::all();
+            $machines = Machine::where('type', 'single')
+                                -> orWhere('type',null)
+                                -> get();
 
             return view("machines.index", compact("machines"));
         } catch (\Exception $e) {

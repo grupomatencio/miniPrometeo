@@ -1,0 +1,68 @@
+<?php
+
+use App\Models\Local;
+use App\Models\lastUserMcDate;
+
+use Illuminate\Support\Facades\DB;
+
+
+
+function nuevaConexion($local)
+{
+    $localDate = Local::find($local);
+    $connectionName = 'mariadb';
+
+    // Decodificar el JSON de la conexión y obtener la primera conexión (índice 0)
+    $datosConexion = json_decode($localDate->dbconection);
+
+    $conexionCero = $datosConexion[0];  // Asegúrate de que el JSON sea un array y accede al primer elemento
+
+    // Modificar la configuración de la conexión de base de datos
+    config([
+        'database.connections.' . $connectionName . '.host' => $conexionCero->ip,
+        'database.connections.' . $connectionName . '.port' => $conexionCero->port,
+        'database.connections.' . $connectionName . '.database' => $conexionCero->database,
+        'database.connections.' . $connectionName . '.username' => $conexionCero->username,
+        'database.connections.' . $connectionName . '.password' => $conexionCero->password,
+    ]);
+
+    // Limpiar la conexión para que se apliquen los nuevos valores
+    DB::purge($connectionName);
+
+    return $connectionName;
+}
+
+function getSerialNumber() :string
+{
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $serial = shell_exec('wmic cpu get ProcessorId');
+
+        // Limpiar el serial eliminando saltos de línea y espacios extra
+        $serial = preg_replace('/\s+/', ' ', trim($serial));
+
+        // Explodemos el serial por el espacio para obtener la parte deseada
+        $parts = explode(' ', $serial);
+
+        // Extraemos el primer valor que debería ser el ProcessorId
+        $processorId = $parts[1]; // Asumiendo que el ProcessorId es el segundo elemento
+
+        return $processorId;
+    }
+
+    // Para Linux
+    elseif (strtoupper(substr(PHP_OS, 0, 6)) === 'LINUX') {
+        $output = "ID: C1 06 08 00 FF FB EB BF";  // solo para probar
+        //shell_exec('sudo /usr/sbin/dmidecode -t 4 | grep ID');
+
+        if ($output) {
+            preg_match('/ID:\s*([a-fA-F0-9\s]+)/', $output, $matches);
+            $serial = isset($matches[1]) ? trim($matches[1]) : null;
+        } else {
+            $serial = null;
+        }
+        return trim($serial);
+    }
+
+    return null; // Si hay otro
+}
+

@@ -87,22 +87,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            {{$data['delegation'] -> name}}
+                            {{$data['name_delegation']}}
                         </td>
                         <td>
-                            @if (count($data['zones']) === 1 )
-                                {{$data['zones'][0] -> name }}
-                            @else
-                                <select name="zones" class="form-control @error('zones') is-invalid @enderror">
-                                    <option value =""> == Elije una Zona ==</option>
-                                    @foreach ($data['zones'] as $zona)
-                                        <option value = "{{$zona -> id}}">{{$zona -> name}} </option>
-                                    @endforeach
-                                </select>
-                                @error('zones')
-                                    <div class="invalid-feedback"> {{ $message }} </div>
-                                @enderror
-                            @endif
+                            {{$data['name_zona']}}
                         </td>
                         <td>
                             @if (count($data['locales']) === 1 )
@@ -123,7 +111,9 @@
 
                 </tbody>
             </table>
-
+                @if (session ('errorSerialNumber'))
+                    <div class="text-danger fw-semibold text-center">{{ session ('errorSerialNumber') }} </div>
+                @endif
         </div>
 
 

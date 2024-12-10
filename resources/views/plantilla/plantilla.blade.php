@@ -147,6 +147,7 @@
     <footer class="d-md-none fixed-bottom">
         <div class="container-fluid py-3">
             <div class="d-flex justify-content-between">
+                TEXT
                 <form action="{{ route('logout') }}" method="POST" style="d-inline-block">
                     @csrf
                     <button type="submit" class="border-0 text-primary text-decoration-underline"

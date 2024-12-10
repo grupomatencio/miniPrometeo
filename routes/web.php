@@ -34,7 +34,7 @@ Route::get('/home', function () {
     return view('home');
 })->name('home')->middleware(['auth', 'check.processor']);
 
-Route::post('/pedir_ayuda', [PedirAyudaController::class, 'sendMessage'])->name('pedir.ayuda');
+Route::get('/pedir_ayuda', [PedirAyudaController::class, 'sendMessage'])->name('pedir.ayuda');
 
 Route::get('/welcome', function() {
     return view('welcome');
@@ -48,3 +48,5 @@ Route::get('/import/store', [ImportController::class, 'store'])->name('import.st
 
 Route::get('/configuracion/buscar', [ConfiguracionController::class, 'buscar'])->name('configuracion.buscar');
 Route::resource('configuracion', ConfiguracionController::class)->names('configuracion');
+
+Route::get('/corto', function() {return view('corto.index');});

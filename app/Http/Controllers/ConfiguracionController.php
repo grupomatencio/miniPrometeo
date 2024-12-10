@@ -24,7 +24,7 @@ class ConfiguracionController extends Controller
         $user_comDataHost = User::where('name','admin') -> first();
 
         // Obtener datos de Local, zona, delegacion
-        $disposicion = $this -> getDisposicion();
+        $disposicion = getDisposicion();
 
         $data = [
             'user_cambio' => $user_cambio,
@@ -231,7 +231,7 @@ class ConfiguracionController extends Controller
         $user_comDataHost ->port = 3506;
 
         // Obtener datos de Local, zona, delegacion
-        $disposicion = $this -> getDisposicion();
+        $disposicion = getDisposicion();
 
         $data = [
             'user_cambio' => $user_cambio,
@@ -252,28 +252,5 @@ class ConfiguracionController extends Controller
             $localIp = $matches[1];
         }
         return $localIp;
-    }
-
-    // Para obtener datos de local, zona, delegation
-    private function getDisposicion () {
-        $locales = Local::all();
-        $zones=Zone::all();
-        $delegation = Delegation::all();
-        $name_zona = "";
-        $name_delegation = "";
-
-        if (count($zones) == 1) {
-            $name_zona = $zones[0] -> name;
-        }
-
-        if (count($delegation) == 1) {
-            $name_delegation = $delegation[0] ->name;
-        }
-
-        return $disposicion = [
-            'locales' => $locales,
-            'name_zona' =>  $name_zona,
-            'name_delegation' => $name_delegation
-        ];
     }
 }

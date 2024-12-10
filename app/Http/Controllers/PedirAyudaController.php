@@ -11,25 +11,35 @@ use App\Models\SerialNumbers;
 class PedirAyudaController extends Controller
 {
 
-    protected $getProcessorSerialNumberService;
-
-    public function __construct(getProcessorSerialNumber $getProcessorSerialNumber) {
-        $this -> getProcessorSerialNumberService = $getProcessorSerialNumber;
-    }
 
     public function sendMessage()
     {
-     $serialNumber = $this -> getProcessorSerialNumberService -> getSerialNumber();
-    $localId = Serialnumbers::find(1);
+
+    $serialNumber =  session('serialNumberProcessor');
+    $localId =  session('localId');
+
+
          if ($serialNumber && $localId) {
                 // URL API Prometeo
-                $url = 'http://80.28.98.247/sendMessage';
+
+
+                $url = 'http://192.168.1.41:8000/api/verify-serial-change';
 
                 // Enviamos un Post con datos
                 $response = Http::post($url, [
                     'serialNumber' => $serialNumber,
                     'local_id' => $localId,
                 ]);
+            /*
+                $url = 'http://192.168.1.41:8000/api/test';
+
+                // Enviamos un Post con datos
+                $response = Http::get($url); */
+                $data = $response -> json ();
+
+
+
+                dd($data);
 
                 // Respusta
                 if ($response->successful()) {

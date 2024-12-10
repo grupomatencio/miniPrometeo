@@ -6,17 +6,14 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+
 
 use App\Services\getProcessorSerialNumber;
 
 class CheckProcessorSerial
 {
 
-    protected $getProcessorSerialNumberService;
-
-    public function __construct(getProcessorSerialNumber $getProcessorSerialNumber) {
-        $this -> getProcessorSerialNumberService = $getProcessorSerialNumber;
-    }
     /**
      * Handle an incoming request.
      *
@@ -26,73 +23,101 @@ class CheckProcessorSerial
      */
     public function handle(Request $request, Closure $next)
     {
-        $serialNumber = $this -> getProcessorSerialNumberService -> getSerialNumber();
-        log::info($serialNumber);
-        if ($serialNumber) {
-            $respustaServidor = $this -> compartirSerialNumber($serialNumber);
-            // $respustaServidor = true;  // - Para comprobar
-            if($respustaServidor){
-                session() -> flash('error',$serialNumber);
-                Log::info('Todo bien');
-                Log::info($serialNumber);
-            } else {
-                $errorMessage = 'Serial Number es icorrecto';
-                session() -> flash('error',$errorMessage);
-                Log::info('error de comparacion');
-                return response() -> view('permission.index');
 
+        $error = false; // flag para error
+
+        // Comprobar hay configuraciones en BD o no
+
+        if ($this -> checkConfiguracion()) {
+
+            $local = $this -> checkConfiguracion();
+
+            // Comprobar serial numero de processador
+
+            $serialNumberProcessor = getSerialNumber();
+
+
+            if ($serialNumberProcessor) {
+
+                $checkSerialNumber = $this -> compartirSerialNumber($serialNumberProcessor, $local);
+
+                // dd ($checkSerialNumber);
+
+                if($checkSerialNumber[0] == false){
+
+                    $errorMessage = $checkSerialNumber[1];
+                    session() -> flash('error',$errorMessage);
+                    $error = true;
+                } else {
+                    session() ->forget('error');
+                }
+
+            } else {
+                $errorMessage = 'No se puede determinar el número de procesador para la autorización.';
+                session() -> flash('error',$errorMessage);
+                $error = true;
             }
+        } else {
+
+            $errorMessage = 'El servidor no está configurado. Configure el servidor.';
+            session() -> flash('error',$errorMessage);
+            $error = true;
 
         }
+
         return $next($request);
+
     }
 
 
-    /*private function compartirSerialNumber($serialNumber) {
 
+    private function compartirSerialNumber($serialNumberProcessor, $local) {
 
-        // URL API Prometeo
-        $url = 'http://192.168.1.182/api/index';
+        // dd($local);
 
+        try {
+            $connection = DB::connection('remote_prometeo_test');
 
-        log::info('middle');
-        log::info($serialNumber);
-        // Enviamos un Post con datos
-        /* $response = Http::post($url, [
-            'key1' => $serialNumber
-        ]);
+            //dd($local[0]->id);
 
-        $response = Http::get($url);
+            $result =$connection->table('licences')
+                    -> where('local_id',$local)
+                    -> where('serial_number',$serialNumberProcessor )
+                    -> first ();
 
-        log::info('middle');
-        log::info($response);
+                //    dd($result);
 
-        // Respusta
-        if ($response->successful()) {
-            return true;
-        } else {
-            return false;
+                    if ($result && $result !== null) {
+                        // dd($result);
+                        return [true, null];
+                    } else {
+                        // dd($result);
+                        $error = "Serial numero de processador es incorrecto";
+                        session([ 'localId' => $local, "serialNumberProcessor" => $serialNumberProcessor]);
+
+                        return [false, $error];
+                    }
+
+        }catch (\Illuminate\Database\QueryException $ex) {
+            $error = "No hay conexión.";
+            return [false, $error];
+        } catch (\Exception $exception) {
+            $error = "Hay algun error desconocido";
+            return [false, $error];
+        }
+    }
+
+    private function checkConfiguracion () {
+
+        return 3;
+
+        $configuracion = getDisposicion();
+
+        if (!isset($configuracion['name_delegation']) || $configuracion['name_delegation'] == null || !isset($configuracion['name_zona']) || $configuracion['name_zona'] == null ||
+            !isset($configuracion['locales']) || $configuracion['locales'] == null || is_array($configuracion['locales'])) {
+            return 0;
         }
 
-    }*/
-
-    private function compartirSerialNumber($serialNumber) {
-        // URL API Prometeo
-        $url = 'http://192.168.1.182/api/index';
-        log::info('Enviando solicitud a la API: ' . $url);
-
-        // Enviamos un GET
-        $response = Http::get($url);
-
-        // Registra el código de estado y el cuerpo de la respuesta
-        log::info('Código de estado de la respuesta: ' . $response->status());
-        log::info('Cuerpo de la respuesta: ' . $response->body());
-
-        // Verifica si la respuesta fue exitosa
-        if ($response->successful()) {
-            return true;
-        } else {
-            return false;
-        }
+        return $configuracion['locales'];
     }
 }

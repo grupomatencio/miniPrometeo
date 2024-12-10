@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\SerialNumbers;
+use App\Models\Local;
 use Illuminate\Support\Facades\Log;
 
 class ApiControllerGetSerialNumber extends Controller
@@ -25,7 +25,7 @@ class ApiControllerGetSerialNumber extends Controller
         log::info($serialNumber);
 
 
-        $findSerialNumber = SerialNumbers::where('serialnumber', $serialNumber ) -> fistOrFile();
+        $findSerialNumber = Local::fistOrFile();
 
         log::info('bd');
         log::info($findSerialNumber);

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Local;
+use App\Models\Zone;
+use App\Models\Delegation;
 use App\Models\lastUserMcDate;
 
 use Illuminate\Support\Facades\DB;
@@ -65,4 +67,27 @@ function getSerialNumber() :string
 
     return null; // Si hay otro
 }
+
+    // Para obtener datos de local, zona, delegation
+    function getDisposicion () {
+        $locales = Local::all();
+        $zones=Zone::all();
+        $delegation = Delegation::all();
+        $name_zona = "";
+        $name_delegation = "";
+
+        if (count($zones) == 1) {
+            $name_zona = $zones[0] -> name;
+        }
+
+        if (count($delegation) == 1) {
+            $name_delegation = $delegation[0] ->name;
+        }
+
+        return $disposicion = [
+            'locales' => $locales,
+            'name_zona' =>  $name_zona,
+            'name_delegation' => $name_delegation
+        ];
+    }
 

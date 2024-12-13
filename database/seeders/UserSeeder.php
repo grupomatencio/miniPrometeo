@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
 
 class UserSeeder extends Seeder
 {
@@ -29,11 +30,11 @@ class UserSeeder extends Seeder
         ]);
         User::create([
             'name' => "ccm",
-            'password' => bcrypt("ccm10"),
+            'password' => Crypt::encryptString("ccm10"),
         ]);
         User::create([
             'name' => "admin",
-            'password' => bcrypt("master"),
+            'password' => Crypt::encryptString("master"),
         ]);
 
     }

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PedirAyudaController;
 use App\Http\Controllers\MachineController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ConfiguracionController;
 
@@ -30,9 +31,7 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-Route::get('/home', function () {
-    return view('home');
-})->name('home')->middleware(['auth', 'check.processor']);
+Route::get('/home',[HomeController::class, 'index'] )->name('home')->middleware(['auth', 'check.processor']);
 
 Route::get('/pedir_ayuda', [PedirAyudaController::class, 'sendMessage'])->name('pedir.ayuda');
 

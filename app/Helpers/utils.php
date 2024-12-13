@@ -2,10 +2,12 @@
 
 use App\Models\Local;
 use App\Models\Zone;
+use App\Models\User;
 use App\Models\Delegation;
 use App\Models\lastUserMcDate;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -26,6 +28,7 @@ function nuevaConexion($local)
         'database.connections.' . $connectionName . '.database' => $conexionCero->database,
         'database.connections.' . $connectionName . '.username' => $conexionCero->username,
         'database.connections.' . $connectionName . '.password' => $conexionCero->password,
+
     ]);
 
     // Limpiar la conexión para que se apliquen los nuevos valores
@@ -33,6 +36,42 @@ function nuevaConexion($local)
 
     return $connectionName;
 }
+
+//
+
+
+// conexion depende de nombre usuario
+function nuevaConexionLocal($name)
+{
+    $user = User::where('name', $name) ->first();
+    $connectionName = 'mariadb'. '-'. $name;
+
+    if ($name = 'admin') {
+        $database = 'ticketserver';
+    } else {
+        $database = "comdata";
+    }
+
+    // Log::info($database);
+
+
+    // Modificar la configuración de la conexión de base de datos
+    config([
+        'database.connections.' . $connectionName . '.host' => $user->ip,
+        'database.connections.' . $connectionName . '.port' => $user->port,
+        'database.connections.' . $connectionName . '.database' => $database,
+        'database.connections.' . $connectionName . '.username' => $user->name,
+        'database.connections.' . $connectionName . '.password' => $user->password,
+        'database.connections.' . $connectionName . '.driver' => 'mysql',
+    ]);
+
+    // Limpiar la conexión para que se apliquen los nuevos valores
+    DB::purge($connectionName);
+
+    return $connectionName;
+}
+
+
 
 function getSerialNumber() :string
 {

@@ -74,7 +74,7 @@
         <!-- Fin de sidebar -->
 
         <div class="w-100">
-            <div class="container d-flex justify-content-between pb-0">
+            <div class="container d-flex justify-content-between pb-0 mb-2">
                 <div class="pb-0 text-start">
                     @auth
                         <div>

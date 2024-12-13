@@ -78,14 +78,14 @@ class CheckProcessorSerial
         try {
             $connection = DB::connection('remote_prometeo_test');
 
-            //dd($local[0]->id);
+            // dd($local[0]->id);
 
             $result =$connection->table('licences')
-                    -> where('local_id',$local)
+                    -> where('local_id',$local[0]->id)
                     -> where('serial_number',$serialNumberProcessor )
                     -> first ();
 
-                //    dd($result);
+                // dd($result);
 
                     if ($result && $result !== null) {
                         // dd($result);
@@ -99,6 +99,7 @@ class CheckProcessorSerial
                     }
 
         }catch (\Illuminate\Database\QueryException $ex) {
+             dd($ex);
             $error = "No hay conexión.";
             return [false, $error];
         } catch (\Exception $exception) {
@@ -109,7 +110,6 @@ class CheckProcessorSerial
 
     private function checkConfiguracion () {
 
-        return 3;
 
         $configuracion = getDisposicion();
 

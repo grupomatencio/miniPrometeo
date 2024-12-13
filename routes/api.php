@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiControllerGetSerialNumber;
+use App\Http\Controllers\Api\ApiCheckConexionesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,4 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });*/
 
 Route::get('/index', [ApiControllerGetSerialNumber::class, 'index'])->name('index');
+Route::get('/checkConexion', [ApiCheckConexionesController::class, 'index'])->name('checkConexion');
 Route::post('/compareSerialNumber', [ApiControllerGetSerialNumber::class, 'compareSerialNumber'])->name('compareSerialNumber');

@@ -9,6 +9,12 @@
         <div class="col-8 offset-2 isla-list p-4 mt-2 mb-2 border border-primary">
             <h2 class="mb-3"> Configurar conexión con maquina cambio</h2>
 
+
+
+            @if ($errors->any())
+              <div class=""> {{$errors->first()}} </div>
+            @endif
+
             <!-- IP -->
             <div class="form-floating pb-3">
                 <input type="text" name="ip_cambio" class="form-control @error('ip_cambio') is-invalid @enderror"
@@ -95,6 +101,7 @@
                         <td>
                             @if (count($data['locales']) === 1 )
                                 {{$data['locales'][0] -> name }}
+                                <input type='hidden' name='locales' value = {{$data['locales'][0] -> id }}>
                             @else
                                 <select name="locales" class="form-control @error('locales') is-invalid @enderror">
                                     <option value =""> == Elije un Local ==</option>
@@ -154,7 +161,7 @@
                         @csrf
                         @method('DELETE')
 
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="submitt" class="btn btn-danger">Eliminar</button>
                     </form>
                 </div>
             </div>
@@ -185,7 +192,7 @@
                                                             @csrf
                                                             @method('DELETE')
 
-                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                            <button type="submitt" class="btn btn-danger">Eliminar</button>
                                                         </form>
                                                     </div>
                                                 </div>

@@ -89,27 +89,34 @@ class ConfiguracionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'ip_cambio' => ['required', 'ipv4'],
-            'port_cambio' => ['required', 'numeric', 'max:10001'],
-            'ip_comdatahost' => ['required', 'ipv4'],
-            'port_comdatahost' => ['required', 'numeric', 'max:10001'],
-            'locales' => ['required']
-        ], [
-            'ip_cambio.required' => 'Este campo es obligatorio.',
-            'port_cambio.required' => 'Este campo es obligatorio.',
-            'ip_comdatahost.required' => 'Este campo es obligatorio.',
-            'port_comdatahost.required' => 'Este campo es obligatorio.',
-            'ip_cambio.ipv4' => 'En este campo solo IP',
-            'ip_comdatahost.ipv4' => 'En este campo solo IP',
-            'port_cambio.numeric' => 'En    este campo solo digitos',
-            'port_cambio.min' => 'Numero de puerto muy grande',
-            'port_comdatahost.numeric' => 'En este campo solo digitos',
-            'port_comdatahost.min' => 'Numero de puerto muy grande',
-            'locales.required' => 'Este campo es obligatorio.'
-        ]);
+       // dd ($request->all());
+
+       $request->validate([
+        'ip_cambio' => ['required', 'ipv4'],
+        'port_cambio' => ['required', 'numeric', 'max:65535'],
+        'ip_comdatahost' => ['required', 'ipv4'],
+        'port_comdatahost' => ['required', 'numeric', 'max:65535'],
+        'locales' => ['required']
+    ], [
+        'ip_cambio.required' => 'Este campo es obligatorio.',
+        'port_cambio.required' => 'Este campo es obligatorio.',
+        'ip_comdatahost.required' => 'Este campo es obligatorio.',
+        'port_comdatahost.required' => 'Este campo es obligatorio.',
+        'ip_cambio.ipv4' => 'En este campo solo IP',
+        'ip_comdatahost.ipv4' => 'En este campo solo IP',
+        'port_cambio.numeric' => 'En    este campo solo digitos',
+        'port_cambio.min' => 'Numero de puerto muy grande',
+        'port_comdatahost.numeric' => 'En este campo solo digitos',
+        'port_comdatahost.min' => 'Numero de puerto muy grande',
+        'locales.required' => 'Este campo es obligatorio.'
+    ]);
+
+
+
+       // dd ($id);
 
         try {
+
 
             $data = $request-> except ('_token');
             User::where('name','ccm') -> update ([
@@ -132,6 +139,8 @@ class ConfiguracionController extends Controller
                      -> where('local_id',$data['locales'])
                      -> where('serial_number',$serialNumberProcessor )
                      -> first ();
+
+                // dd ($result);
 
             } catch (\Exception $exception) {
                 Log::info($exception);
@@ -175,6 +184,7 @@ class ConfiguracionController extends Controller
             }
 
         } catch (\Exception $exception) {
+            dd($exception);
             Log::info($exception);
         }
 
